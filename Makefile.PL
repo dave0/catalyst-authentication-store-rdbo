@@ -1,10 +1,18 @@
 use inc::Module::Install;
 
-name     'Catalyst-Authentication-Store-RDBO';
+name 'Catalyst-Authentication-Store-RDBO';
 all_from 'lib/Catalyst/Authentication/Store/RDBO.pm';
-author   'Dave O'Neill <dmo@dmo.ca>';
+author q{Dave O'Neill <dmo@dmo.ca>};
 
-build_requires 'Test::More';
+perl_version '5.8.1';
+
+requires(
+    'Catalyst::Runtime'                => 0,
+    'Catalyst::Plugin::Authentication' => '0.10008',
+    'Rose::DB::Object'                 => 0,
+);
+
+test_requires 'Test::More';
 
 auto_install;
 

@@ -1,107 +1,83 @@
 package Catalyst::Authentication::Store::RDBO;
-
-use warnings;
 use strict;
+use warnings;
 
-=head1 NAME
+use base qw/Class::Accessor::Fast/;
 
-Catalyst::Authentication::Store::RDBO - The great new Catalyst::Authentication::Store::RDBO!
+our $VERSION = "0.1000";
 
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Catalyst::Authentication::Store::RDBO;
-
-    my $foo = Catalyst::Authentication::Store::RDBO->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
+BEGIN {
+	__PACKAGE__->mk_accessors(qw/config/);
 }
 
-=head2 function2
+sub new
+{
+	my ($class, $config, $app) = @_;
 
-=cut
+	## figure out if we are overriding the default store user class
+	$config->{'store_user_class'} = exists($config->{'store_user_class'})
+	  ? $config->{'store_user_class'}
+	  : "Catalyst::Authentication::Store::RDBO::User";
 
-sub function2 {
+	## make sure the store class is loaded.
+	Catalyst::Utils::ensure_class_loaded($config->{'store_user_class'});
+
+	# TODO: kill this option?
+	## fields can be specified to be ignored during user location.  This allows
+	## the store to ignore certain fields in the authinfo hash.
+
+	$config->{'ignore_fields_in_find'} ||= [];
+
+	my $self = { config => $config };
+
+	bless $self, $class;
+
 }
 
-=head1 AUTHOR
+sub from_session
+{
+	my ($self, $c, $frozenuser) = @_;
 
-Dave O'Neill, C<< <dmo at dmo.ca> >>
+	my $user = $self->config->{'store_user_class'}->new($self->{'config'}, $c);
+	return $user->from_session($frozenuser, $c);
+}
 
-=head1 BUGS
+sub for_session
+{
+	my ($self, $c, $user) = @_;
 
-Please report any bugs or feature requests to C<bug-catalyst-authentication-store-rdbo at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Authentication-Store-RDBO>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+	return $user->for_session($c);
+}
 
+sub find_user
+{
+	my ($self, $authinfo, $c) = @_;
 
+	my $user = $self->config->{'store_user_class'}->new($self->{'config'}, $c);
 
+	return $user->load($authinfo, $c);
+}
 
-=head1 SUPPORT
+sub user_supports
+{
+	my $self = shift;
 
-You can find documentation for this module with the perldoc command.
+	# this can work as a class method on the user class
+	$self->config->{'store_user_class'}->supports(@_);
+}
 
-    perldoc Catalyst::Authentication::Store::RDBO
+sub auto_create_user
+{
+	my ($self, $authinfo, $c) = @_;
+	my $res = $self->config->{'store_user_class'}->new($self->{'config'}, $c);
+	return $res->auto_create($authinfo, $c);
+}
 
+sub auto_update_user
+{
+	my ($self, $authinfo, $c, $res) = @_;
+	$res->auto_update($authinfo, $c);
+	return $res;
+}
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Authentication-Store-RDBO>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Catalyst-Authentication-Store-RDBO>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Catalyst-Authentication-Store-RDBO>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Catalyst-Authentication-Store-RDBO>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Dave O'Neill, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-
-=cut
-
-1; # End of Catalyst::Authentication::Store::RDBO
+1;  # End of Catalyst::Authentication::Store::RDBO
