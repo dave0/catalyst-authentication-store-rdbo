@@ -8,7 +8,7 @@ perl_version '5.8.1';
 
 requires(
     'Catalyst::Runtime'                => 0,
-    'Catalyst::Plugin::Authentication' => '0.10008',
+    'Catalyst::Plugin::Authentication' => '0.10006',
     'Rose::DB::Object'                 => 0,
 );
 
