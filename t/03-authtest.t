@@ -13,9 +13,13 @@ BEGIN {
         or plan skip_all =>
         "DBD::SQLite is required for this test";
 
-    eval { require DBIx::Class }
+    eval { require Rose::DB::Object }
         or plan skip_all =>
-        "DBIx::Class is required for this test";
+        "Rose::DB::Object is required for this test";
+
+    eval { require TestApp::User }
+        or plan skip_all =>
+        "TestApp::User not found: $@";
 
     plan tests => 15;
 
@@ -33,8 +37,8 @@ BEGIN {
                         'password_type' => 'clear'
                     },
                     store => {
-                        'class' => 'DBIx::Class',
-                        'user_model' => 'TestApp::User',
+                        'class' => 'RDBO',
+                        'user_class' => 'TestApp::User',
                     },
                 },
             },
