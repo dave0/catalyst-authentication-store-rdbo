@@ -1,0 +1,11 @@
+.*~
+blib
+Catalyst-Authentication-Store-RDBO-
+\.git/
+\.gitignore
+Makefile$
+Makefile.old
+MANIFEST.bak
+MANIFEST.SKIP
+pm_to_blib
+.*.tar.gz
