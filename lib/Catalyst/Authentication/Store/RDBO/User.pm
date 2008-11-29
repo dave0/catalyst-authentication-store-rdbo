@@ -131,7 +131,16 @@ sub roles
 		}
 		$self->_roles(\@roles);
 	} elsif(exists($self->config->{'role_relation'})) {
-		Catalyst::Exception->throw('role_relation not yet supported');
+		my $relation = $self->config->{'role_relation'};
+		if(!$self->_user->meta->relationship($relation)) {
+			Catalyst::Exception->throw('User object does not have a relation matching role_relation config');
+		}
+		my $role_field = $self->config->{'role_field'};
+		if(!$self->_user->meta->relationship($relation)->foreign_class->meta->column($role_field)) {
+			Catalyst::Exception->throw("role table does not have a column called " . $self->config->{'role_field'});
+		}
+		@roles = map { $_->$role_field } $self->_user->$relation;
+		$self->_roles(\@roles);
 	} else {
 		Catalyst::Exception->throw("user->roles accessed, but no role configuration found");
 	}
