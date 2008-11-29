@@ -14,6 +14,8 @@ requires(
 
 test_requires 'Test::More';
 
+extra_tests;
+
 auto_install;
 
 WriteAll;
