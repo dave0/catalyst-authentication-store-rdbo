@@ -21,7 +21,7 @@ BEGIN {
         or plan skip_all =>
         "TestApp::User not found: $@";
 
-    plan tests => 15;
+    plan tests => 13;
 
     $ENV{TESTAPP_DB_FILE} = "$FindBin::Bin/auth.db" unless exists($ENV{TESTAPP_DB_FILE});
 
@@ -90,17 +90,10 @@ use Catalyst::Test 'TestApp';
     is( $res->content, 'nuffin logged in', 'searchargs based login ok' );
 }
 
-# resultset test
-# searchargs test
 {
-    ok( my $res = request('http://localhost/resultset_login?email=j%40cpants.org&password=letmein'), 'request ok' );
-    is( $res->content, 'jayk logged in', 'resultset based login ok' );
-}
-
-{
-    $ENV{TESTAPP_CONFIG}->{authentication}->{realms}->{users}->{store}->{user_model} = 'Nonexistent::Class';
+    $ENV{TESTAPP_CONFIG}->{authentication}->{realms}->{users}->{store}->{user_class} = 'Nonexistent::Class';
     my $res = request('http://localhost/user_login?username=joeuser&password=hackme');
-    like( $res->content, qr/\$\Qc->model('Nonexistent::Class') did not return a resultset. Did you set user_model correctly?/, 'test for wrong user_class' );
+    like( $res->content, qr/perhaps you forgot to load "Nonexistent::Class"/, 'test for wrong user_class' );
 }
 	    
 	    

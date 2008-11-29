@@ -50,8 +50,8 @@ sub new
 sub _fetch_first
 {
 	my ($self, $query ) = @_;
-	my $results = $self->manager_class->get_objects( 
-		query => [ %$query ],
+	my $results = $self->manager_class->get_objects(
+		query => $query,
 		object_class => $self->user_class,
 		limit => 1,
 	);
@@ -73,8 +73,6 @@ sub load
 		$rdbo_config = 1;
 	}
 
-# TODO: kill authinfo{resultset}
-
 	# User can provide an arrayref containing the arguments to search on
 	# the user class by providing a 'rdbo' authinfo hash.
 	if($rdbo_config && exists($authinfo->{'searchargs'})) {
@@ -92,7 +90,7 @@ sub load
 			}
 		}
 		if(keys %{$searchargs}) {
-			$self->_user($self->_fetch_first( $searchargs ));
+			$self->_user($self->_fetch_first( [ %$searchargs ]));
 		} else {
 			Catalyst::Exception->throw("User retrieval failed: no columns from " . $self->config->{'user_model'} . " were provided");
 		}
