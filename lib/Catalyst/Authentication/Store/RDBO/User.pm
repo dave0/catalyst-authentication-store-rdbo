@@ -199,3 +199,104 @@ sub AUTOLOAD
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Catalyst::Authentication::Store::RDBO::User - The backing user
+class for the Catalyst::Authentication::Store::RDBO storage
+module.
+
+=head1 VERSION
+
+This documentation refers to version 0.1000.
+
+=head1 SYNOPSIS
+
+Internal - not used directly, please see
+L<Catalyst::Authentication::Store::RDBO> for details on how to
+use this module. If you need more information than is present there, read the
+source.
+
+
+=head1 DESCRIPTION
+
+The Catalyst::Authentication::Store::RDBO::User class implements user storage
+connected to an underlying Rose::DB::Object subclass.
+
+=head1 SUBROUTINES / METHODS
+
+=head2 new
+
+Constructor.
+
+=head2 load ( $authinfo, $c )
+
+Retrieves a user from storage using the information provided in $authinfo.
+
+=head2 supported_features
+
+Indicates the features supported by this class.  These are currently Roles and Session.
+
+=head2 roles
+
+Returns an array of roles associated with this user, if roles are configured for this user class.
+
+=head2 for_session
+
+Returns a serialized user for storage in the session.
+
+=head2 from_session
+
+Revives a serialized user from storage in the session.
+
+=head2 get ( $fieldname )
+
+Returns the value of $fieldname for the user in question.  Roughly translates to a call to
+the $fieldname method of the underlying Rose::DB::Object subclass.
+
+=head2 get_object
+
+Retrieves the underlying Rose::DB::Object-subclassed object that corresponds to this user
+
+=head2 obj (method)
+
+Synonym for get_object
+
+=head2 auto_create
+
+This is called when the auto_create_user option is turned on in
+Catalyst::Plugin::Authentication and a user matching the authinfo provided is not found.
+By default, this will call the C<auto_create()> method of the resultset associated
+with this object. It is up to you to implement that method.
+
+=head2 auto_update
+
+This is called when the auto_update_user option is turned on in
+Catalyst::Plugin::Authentication. Note that by default the RDBO store
+uses every field in the authinfo hash to match the user. This means any
+information you provide with the intent to update must be ignored during the
+user search process. Otherwise the information will most likely cause the user
+record to not be found. To ignore fields in the search process, you
+have to add the fields you wish to update to the 'ignore_fields_in_find'
+authinfo element.  Alternately, you can use one of the advanced row retrieval
+methods (searchargs or resultset).
+
+=head1 BUGS AND LIMITATIONS
+
+None known currently, please email the author if you find any.
+
+=head1 AUTHOR
+
+Dave O'Neill (dmo@dmo.ca)
+
+Based heavily on L<Catalyst::Authentication::Store::DBIx::Class> by Jason Kuri (jayk@cpan.org)
+
+=head1 LICENSE
+
+Copyright (c) 2008 the aforementioned authors. All rights
+reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut
