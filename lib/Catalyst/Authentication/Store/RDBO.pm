@@ -1,7 +1,7 @@
 package Catalyst::Authentication::Store::RDBO;
 use strict;
 use warnings;
-
+use 5.008_001;
 use base qw/Class::Accessor::Fast/;
 
 our $VERSION = "0.1000";
